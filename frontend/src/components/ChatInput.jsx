@@ -4,22 +4,26 @@ import Picker, { Emoji } from "emoji-picker-react";
 import { IoMdSend } from "react-icons/io";
 import { BsEmojiSmileFill } from "react-icons/bs";
 
-function ChatInput() {
+function ChatInput({handleSendMsg}) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [msg, setMsg] = useState("");
-  const [chosenEmoji, setChosenEmoji] = useState(null);
 
   const handleEmojiPickerHideShow = () => {
     setShowEmojiPicker(!showEmojiPicker);
   };
 
   const handleEmojiClick = (event, emojiObject) => {
-    debugger;
-    console.log(emojiObject);
-    setChosenEmoji(emojiObject);
     let message = msg;
     message += emojiObject.emoji;
     setMsg(message);
+  };
+
+  const sendChat = (event) => {
+    event.preventDefault();
+    if(msg.length > 0){
+      handleSendMsg(msg);
+      setMsg('');
+    }
   };
 
   return (
@@ -30,7 +34,7 @@ function ChatInput() {
             {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick} />}
         </div>
       </div>
-      <form className='input-container'>
+      <form className='input-container' onSubmit={(e) => sendChat(e)}>
         <input type="text" placeholder='type your message here' value={msg} onChange={(e)=> setMsg(e.target.value)} />
         <button className='submit'>
             <IoMdSend/>
@@ -47,6 +51,10 @@ const Container = styled.div`
   background-color: #080420;
   padding: 0 2rem;
   padding-bottom: 0.3rem;
+  @media screen and (min-width: 720px) and (max-width: 1080px){
+    padding: 0 1rem;
+    gap: 1rem;
+  }
   .button-container{
     display: flex;
     align-items: center;
@@ -62,7 +70,29 @@ const Container = styled.div`
         .emoji-picker-react {
             position: absolute;
             top: -350px;
-      }
+            background-color: #080420;
+            box-shadow: 0 5px 10px #9a86f3;
+            border-color: #9a86f3;
+            .emoji-scroll-wrapper::-webkit-scrollbar{
+              background-color: #808420;
+              width: 5px;
+              &-thumb{
+                background-color: #9a86f3;
+              }
+            }
+            .emoji-categories{
+              button{
+                filter: contrast(0);
+              }
+            }
+            .emoji-search{
+              background-color: transparent;
+              border-color: #9a86f3;
+            }
+            .emoji-group:before{
+              background-color: #080420;
+            }
+        }
     }
   }
   .input-container{
@@ -95,6 +125,12 @@ const Container = styled.div`
         align-items: center;
         background-color: #9a86f3;
         border: none;
+        @media screen and (min-width: 720px) and (max-width: 1080px){
+          padding: 0.3rem 1rem;
+          svg{
+            font-size: 1rem;
+          }
+        }
         svg{
             font-size: 2rem;
             color: white;

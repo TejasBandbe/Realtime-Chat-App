@@ -109,6 +109,7 @@ const Container = styled.div`
       .avatar{
         img{
           height: 3rem;
+          padding-left: 0.5rem;
         }
       }
       .username{
