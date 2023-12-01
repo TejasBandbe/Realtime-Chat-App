@@ -67,13 +67,7 @@ function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
     setMessages(msgs);
   };
 
-  useEffect(() => {
-    if(socket.current) {
-      socket.current.on("msg-receive", (msg)=>{
-        setArrivalMessage({fromSlef: false, message: msg});
-      });
-    }
-  }, []);
+  
   
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);

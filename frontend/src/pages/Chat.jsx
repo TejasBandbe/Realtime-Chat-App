@@ -35,7 +35,7 @@ function Chat() {
   useEffect(() => {
     if(currentUser){
       setIsLive(true);
-      socket.current = io(host);
+      socket.current = io(host);  
       socket.current.emit("add-user", currentUser._id);
     }else{
       setIsLive(false);
