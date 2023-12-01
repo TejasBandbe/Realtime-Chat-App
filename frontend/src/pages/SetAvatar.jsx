@@ -7,14 +7,19 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { setAvatarRoute } from '../utils/APIRoutes';
 import { Buffer } from "buffer";
+import { constants, log } from '../utils/env';
+import ServerDown from '../components/ServerDown';
+import AvatarNotFound from '../components/AvatarNotFound';
 
 function SetAvatar() {
-    const api = 'https://api.multiavatar.com/45678945';
+    const api = constants.MULTIAVATAR_API;
     const history = useHistory();
     
     const [avatars, setAvatars] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedAvatar, setSelectedAvatar] = useState(undefined);
+    const [isLive, setIsLive] = useState(true);
+    const [inLimit, setInLimit] = useState(true);
 
     const toastOptions = {
         autoClose:1500, 
@@ -30,17 +35,24 @@ function SetAvatar() {
         }
         else{
             const user = await JSON.parse(localStorage.getItem("chat-app-user"));
-            const {data} = await axios.post(`${setAvatarRoute}/${user._id}`, {
+            await axios.post(`${setAvatarRoute}/${user._id}`, {
                 image: avatars[selectedAvatar],
+            })
+            .then(res => {
+                if(res.data.isSet){
+                    user.isAvatarImageSet = true;
+                    user.avatarImage = res.data.image;
+                    localStorage.setItem("chat-app-user", JSON.stringify(user));
+                    history.push("/");
+                }else{
+                    toast.error("error setting avatar. please try again", toastOptions);
+                }
+            })
+            .catch(err => {
+                log(err);
+                setIsLive(false);
             });
-            if(data.isSet){
-                user.isAvatarImageSet = true;
-                user.avatarImage = data.image;
-                localStorage.setItem("chat-app-user", JSON.stringify(user));
-                history.push("/");
-            }else{
-                toast.error("error setting avatar. please try again", toastOptions);
-            }
+            
         }
     };
 
@@ -49,20 +61,29 @@ function SetAvatar() {
             history.push("/login");
         }
         async function fetchAvatars() {
-        const data = [];
+        const arr = [];
         for(let i=0; i<4; i++){
-            const image = await axios.get(`${api}/${Math.round(Math.random()*1000)}`);
-            const buffer = new Buffer(image.data);
-            data.push(buffer.toString("base64"));
+            await axios.get(`${api}/${Math.round(Math.random()*1000)}`)
+            .then(res => {
+                const buffer = new Buffer(res.data);
+                arr.push(buffer.toString("base64"));
+            })
+            .catch(err => {
+                log(err);
+                if(err.response.status === 429){
+                    setInLimit(false);
+                }
+            });
         }
-        setAvatars(data);
+        setAvatars(arr);
         setIsLoading(false);
-    }
-    fetchAvatars();
-
+        }
+        fetchAvatars();
+        setIsLive(true);
       },[]);
 
-  return (
+  return (<>
+  { isLive ? ( inLimit ? (
     <>
     {
         isLoading ? <Container>
@@ -91,7 +112,12 @@ function SetAvatar() {
 </Container>
 )}
 <ToastContainer/>
-    </>
+    </> ) : (
+        <AvatarNotFound/>
+    )) : (
+        <ServerDown/>
+    )
+    }</>
   );
 }
 
@@ -104,17 +130,31 @@ const Container = styled.div`
     background-color: #131324;
     height: 100vh;
     width: 100vw;
+    @media screen and (max-width: 720px){
+        gap: 1rem;
+      }
     .loader{
         max-inline-size: 100%;
+        @media screen and (max-width: 720px){
+            max-inline-size: 60%;
+          }
     }
 
     .title-container{
         h1{
             color: white;
+            @media screen and (max-width: 720px){
+                font-size: 1.5rem;
+                text-align: center;
+              }
         }
     }
     .avatars{
         display: flex;
+        @media screen and (max-width: 720px){
+            flex-direction: column;
+            gap: 0;
+          }
         gap: 2rem;
         .avatar{
             border: 0.4rem solid transparent;
@@ -125,6 +165,9 @@ const Container = styled.div`
             transition: 0.5sec ease-in-out;
             img{
                 height: 6rem;
+                @media screen and (max-width: 720px){
+                    height: 4rem;
+                  }
             }
         }
         .selected{

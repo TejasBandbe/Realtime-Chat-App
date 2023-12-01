@@ -1,7 +1,6 @@
 import React from 'react';
 import { useHistory } from "react-router-dom";
 import styled from 'styled-components';
-import axios from "axios";
 import { BiPowerOff } from "react-icons/bi";
 
 function Logout() {
@@ -31,6 +30,9 @@ const Button = styled.div`
   svg{
     font-size: 1.3rem;
     color: #ebe7ff;
+    @media screen and (max-width: 720px){
+      font-size: 1rem;
+    }
   }
 `;
 

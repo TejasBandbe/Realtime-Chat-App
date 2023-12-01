@@ -3,32 +3,31 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes");
 const messageRoute = require("./routes/messagesRoute");
-const deleteRouter = require("./routes/deleteMessages");
+const {constants} = require("./env");
 
 const app = express();
 const socket = require("socket.io");
 require("dotenv").config();
 
-app.use(cors());
+app.use(cors("*"));
 app.use(express.json());
 
 app.use("/api/auth", userRoutes);
 app.use("/api/messages", messageRoute);
-app.use(deleteRouter);
 
-mongoose.connect(process.env.MONGO_URL, {}).then(() => {
+mongoose.connect(constants.MONGO_URL, {}).then(() => {
     console.log("DB connection successfull");
 }).catch((err) => {
     console.log(err.message);
 });
 
-const server = app.listen(process.env.PORT, () => {
-    console.log(`server started on ${process.env.PORT}`);
+const server = app.listen(constants.SERVER_PORT, '0.0.0.0', () => {
+    console.log(`server started on ${constants.SERVER_PORT}`);
 });
 
 const io = socket(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
         credentials: true,
     },
 });

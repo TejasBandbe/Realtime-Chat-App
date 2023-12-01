@@ -6,8 +6,9 @@ import axios from "axios";
 import { getAllMessagesRoute, sendMessageRoute } from '../utils/APIRoutes';
 import { v4 as uuidv4 } from "uuid";
 import { GoArrowLeft } from "react-icons/go";
+import { log } from '../utils/env';
 
-function ChatContainer({currentChat, currentUser, socket}) {
+function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   
@@ -22,25 +23,21 @@ function ChatContainer({currentChat, currentUser, socket}) {
       }
   }, []);
 
-  // useEffect(() => {
-  //   debugger;
-  //     const response = axios.post(getAllMessagesRoute, {
-  //       from: currentUser._id,
-  //       to: currentChat._id,
-  //     });
-  //     setMessages(response.data);
-  // },[currentChat]);
-
   useEffect(() => {
     if(currentChat){
     const delay = 10;
 
     const timerId = setTimeout(async() => {
-      const response = await axios.post(getAllMessagesRoute, {
+      await axios.post(getAllMessagesRoute, {
         from: currentUser._id,
         to: currentChat._id,
+      })
+      .then(res => {
+        setMessages(res.data);
+      })
+      .catch(err => {
+        log(err);
       });
-      setMessages(response.data);
     }, delay);
 
     return () => clearTimeout(timerId);
@@ -52,6 +49,12 @@ function ChatContainer({currentChat, currentUser, socket}) {
       from: currentUser._id,
       to: currentChat._id,
       message: msg,
+    })
+    .then(res => {
+      log(res);
+    })
+    .catch(err => {
+      log(err);
     });
     socket.current.emit("send-msg", {
       to: currentChat._id,
@@ -77,7 +80,7 @@ function ChatContainer({currentChat, currentUser, socket}) {
   },[arrivalMessage]);
 
   useEffect(() => {
-    scrollRef.current ?.scrollIntoView({behaviour: "smooth"});
+    scrollRef.current?.scrollIntoView({behaviour: "smooth"});
   },[messages]);
 
   return (
@@ -86,7 +89,7 @@ function ChatContainer({currentChat, currentUser, socket}) {
     currentChat && (
     <Container>
       <div className="chat-header">
-        <div className="back-arrow">
+        <div className="back-arrow" onClick={closeChatWindow}>
             <GoArrowLeft/>
         </div>
         <div className="user-details">
@@ -138,6 +141,7 @@ const Container = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
+    background-color: #0d0d30;
     .back-arrow{
       display: none;
       justify-content: center;
@@ -150,6 +154,9 @@ const Container = styled.div`
       svg{
         font-size: 1.3rem;
         color: white;
+        @media screen and (max-width: 720px){
+          font-size: 1rem;
+        }
       }
       @media screen and (max-width: 720px){
         display: flex;
@@ -162,12 +169,17 @@ const Container = styled.div`
         .avatar{
             img{
                 height: 3rem;
+                @media screen and (max-width: 720px){
+                  height: 2rem;
+                }
             }
         }
         .username{
           h3{
             color: white;
-
+            @media screen and (max-width: 720px){
+              font-size: 1rem;
+            }
           }
         }
     }
@@ -186,6 +198,10 @@ const Container = styled.div`
         border-radius: 1rem;
       }
     }
+    @media screen and (max-width: 720px){
+      gap: 0.4rem;
+      padding: 1rem 1rem;
+    }
     .message{
       display: flex;
       align-items: center;
@@ -196,12 +212,17 @@ const Container = styled.div`
         font-size: 1.1rem;
         border-radius: 1rem;
         color: #d1d1d1;
+        @media screen and (max-width: 720px){
+          max-width: 90%;
+          padding: 0.6rem;
+          font-size: 0.8rem;
+        }
       }
     }
     .sended{
       justify-content: flex-end;
       .content{
-        background-color: #4f04ff21;
+        background-color: #3D3560;
       }
     }
     .received{

@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Link, useHistory } from "react-router-dom";
-import Logo from "../assets/logo.svg";
+import Logo from "../assets/chat.png";
 import {ToastContainer, toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { loginRoute } from '../utils/APIRoutes';
+import { constants, log } from '../utils/env';
+import ServerDown from '../components/ServerDown';
 
 function Login() {
   const [values, setValues] = useState({
     username: "",
     password: "",
   });
+  const [isLive, setIsLive] = useState(true);
 
   useEffect(() => {
     if(localStorage.getItem("chat-app-user")) {
@@ -34,19 +37,25 @@ function Login() {
     event.preventDefault();
     if(handleValidation()){
       const{password, username} = values;
-      const {data} = await axios.post(loginRoute, {
+      await axios.post(loginRoute, {
         username,
         password
+      })
+      .then(res => {
+        if(res.data.status === false){
+        
+          toast.error(res.data.msg, toastOptions);
+        }
+        if(res.data.status === true){
+          
+          localStorage.setItem('chat-app-user', JSON.stringify(res.data.user));
+          history.push("/setAvatar");
+        }  
+      })
+      .catch(err => {
+        log(err);
+        setIsLive(false);
       });
-      if(data.status === false){
-        
-        toast.error(data.msg, toastOptions);
-      }
-      if(data.status === true){
-        
-        localStorage.setItem('chat-app-user', JSON.stringify(data.user));
-        history.push("/setAvatar");
-      }      
     }
   }
 
@@ -64,22 +73,26 @@ function Login() {
   };
 
   return (
-    <>
+    <>{ isLive ? (
+      <>
     <FormContainer>
       <form onSubmit={(event) => handleSubmit(event)}>
         <div className="brand">
           <img src={Logo} alt="Logo" />
-          <h1>snappy</h1>
+          <h1>{constants.WEBSITE_NAME}</h1>
         </div>
         <input type="text" placeholder='username' name='username' min='3' onChange={e => handleChange(e)}/>
         <input type="password" placeholder='password' name='password' onChange={e => handleChange(e)}/>
         <button type="submit">Login</button>
-        <span>Don't have an account ? <Link to="/register">Register</Link></span>
+        <span>Don't have an account?</span>
+        <span><Link to="/register">Register</Link></span>
       </form>
     </FormContainer>
-    <ToastContainer/>
-    </>
-  )
+    <ToastContainer/> </> ) : (
+      <ServerDown/>
+    )
+  }</>
+ )
 }
 
 const FormContainer = styled.div`
@@ -91,6 +104,10 @@ const FormContainer = styled.div`
   gap: 1rem;
   align-items: center;
   background-color: #131324;
+  @media screen and (max-width: 720px){
+    gap: 0.7rem;
+    padding-bottom: 10rem;
+  }
   .brand{
     display: flex;
     align-items: center;
@@ -98,10 +115,15 @@ const FormContainer = styled.div`
     justify-content: center;
     img{
       height: 5rem;
+      @media screen and (max-width: 720px){
+        height: 3rem;
+      }
     }
     h1{
       color: white;
-      text-transform: uppercase;
+      @media screen and (max-width: 720px){
+        font-size: 1.5rem;
+      }
     }
   }
   form{
@@ -111,6 +133,9 @@ const FormContainer = styled.div`
     background-color: #00000076;
     border-radius: 2rem;
     padding: 3rem 5rem;
+    @media screen and (max-width: 720px){
+      gap: 1rem;
+    }
     input{
       background-color: transparent;
       padding: 1rem;
@@ -122,6 +147,9 @@ const FormContainer = styled.div`
       &:focus{
         border: 0.1rem solid #997af0;
         outline: none;
+      }
+      @media screen and (max-width: 720px){
+        padding: 0.6rem;
       }
     }
     button{
@@ -138,10 +166,19 @@ const FormContainer = styled.div`
       &:hover{
         background-color: #4e0eff;
       }
+      @media screen and (max-width: 720px){
+        padding: 0.6rem;
+        margin-top: 0.6rem;
+        margin-bottom: 0.6rem;
+      }
     }
     span{
       color: white;
+      text-align: center;
       text-transform: uppercase;
+      @media screen and (max-width: 720px){
+        font-size: 0.8rem;
+      }
       a{
         color: #4e0eff;
         text-decoration: none;

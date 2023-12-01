@@ -5,8 +5,10 @@ import axios from "axios";
 import { allUsersRoute, host } from '../utils/APIRoutes';
 import Contacts from '../components/Contacts';
 import Welcome from '../components/Welcome';
+import ServerDown from '../components/ServerDown';
 import ChatContainer from '../components/ChatContainer';
 import { io } from "socket.io-client";
+import { log } from '../utils/env';
 
 function Chat() {
   const socket = useRef();
@@ -15,12 +17,16 @@ function Chat() {
   const [currentUser, setCurrentUser] = useState(undefined);
   const [currentChat, setCurrentChat] = useState(undefined);
   const [isLoaded, setIsLoaded] = useState(false);
-  // const [displayContactFlag, setDisplayContactFlag] = useState(true);
+  const [gridStyle, setGridStyle] = useState({
+    gridTemplateColumns: '100% 0%',
+  });
+  const [isLive, setIsLive] = useState(true);
 
   useEffect(() => {
     if(!localStorage.getItem("chat-app-user")){
       history.push("/login");
     }else{
+      setIsLive(true);
       setCurrentUser(JSON.parse(localStorage.getItem("chat-app-user")));
       setIsLoaded(true);
     }
@@ -28,8 +34,11 @@ function Chat() {
 
   useEffect(() => {
     if(currentUser){
+      setIsLive(true);
       socket.current = io(host);
       socket.current.emit("add-user", currentUser._id);
+    }else{
+      setIsLive(false);
     }
   },[currentUser]);
 
@@ -37,8 +46,14 @@ function Chat() {
     async function fetchContacts() {
       if(currentUser){
         if(currentUser.isAvatarImageSet){
-          const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-          setContacts(data.data);
+          await axios.get(`${allUsersRoute}/${currentUser._id}`)
+          .then(res => {
+            setContacts(res.data);
+          })
+          .catch(err => {
+            setIsLive(false);
+            log(err);
+          });
         }
         else{
           history.push("/setAvatar");
@@ -50,22 +65,63 @@ function Chat() {
 
   const handleChatChange = (chat) => {
     setCurrentChat(chat);
+    openChatWindow();
   };
 
+  const openChatWindow = () => {
+    if (window.innerWidth < 720) {
+      setGridStyle({
+        gridTemplateColumns: '0% 100%',
+      });
+    }
+  };
+
+  const closeChatWindow = () => {
+    if (window.innerWidth < 720) {
+      setGridStyle({
+        gridTemplateColumns: '100% 0%',
+      });
+    }
+  }
+
   return (
+    <>{ isLive ? (
     <Container>
-      <div className="container">
-
-          <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange}/>
-
       {
-        isLoaded && currentChat === undefined ?
-        (<Welcome currentUser={currentUser}/>) :
-        (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket}/>)
-      }
+        window.innerWidth > 720 ? (
+        <div className="container" style={{gridTemplateColumns: '25% 75%'}}>
+
+        <Contacts contacts={contacts} currentUser={currentUser} 
+        changeChat={handleChatChange}/>
+
+        {
+          isLoaded && currentChat === undefined ?
+          (<Welcome currentUser={currentUser}/>) :
+          (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />)
+        }
 
       </div>
-    </Container>
+        ) : (
+        <div className="container" style={gridStyle}>
+
+        <Contacts contacts={contacts} currentUser={currentUser} 
+        changeChat={handleChatChange}/>
+
+        {
+          isLoaded && currentChat === undefined ?
+          (<Welcome currentUser={currentUser}/>) :
+          (<ChatContainer currentChat={currentChat} currentUser={currentUser} 
+            socket={socket} closeChatWindow={closeChatWindow}/>)
+        }
+
+      </div>
+        )
+      }
+      
+    </Container> ) : (
+      <ServerDown/>
+    )
+  }</>
 )
 }
 
@@ -83,10 +139,7 @@ const Container = styled.div`
     width: 85vw;
     background-color: #00000076;
     display: grid;
-    grid-template-columns: 25% 75%;
-    @media screen and (min-width: 720px) and (max-width: 1080px){
-      grid-template-columns: 35% 65%;
-    }
+
   }
 `;
 
