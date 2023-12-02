@@ -139,7 +139,10 @@ const Container = styled.div`
     width: 85vw;
     background-color: #00000076;
     display: grid;
-
+    @media screen and (max-width: 720px){
+      height: 100vh;
+      width: 100vw;
+    }
   }
 `;
 

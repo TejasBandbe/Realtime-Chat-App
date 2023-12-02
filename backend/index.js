@@ -21,7 +21,7 @@ mongoose.connect(constants.MONGO_URL, {}).then(() => {
 });
 
 const server = app.listen(constants.SERVER_PORT, '0.0.0.0', () => {
-    console.log(`server started on ${constants.SERVER_PORT}`);
+    console.log(`server started on ${constants.SERVER_PORT}...`);
 });
 
 const io = socket(server, {

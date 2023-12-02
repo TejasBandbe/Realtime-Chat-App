@@ -122,7 +122,6 @@ function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
 }
 
 const Container = styled.div`
-  padding-top: 1rem;
   display: grid;
   grid-template-rows: 10% 78% 12%;
   gap: 0.1rem;
@@ -209,7 +208,7 @@ const Container = styled.div`
         @media screen and (max-width: 720px){
           max-width: 90%;
           padding: 0.6rem;
-          font-size: 0.8rem;
+          font-size: 1rem;
         }
       }
     }

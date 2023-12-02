@@ -15,9 +15,9 @@ function App() {
         <Route exact path="/setAvatar" component={SetAvatar}/>
         <Route exact path="/" component={Chat}/>
     </Router>
+      </div>
     </div>
-    </div>
-  );
+     );
 }
 
 export default App;
