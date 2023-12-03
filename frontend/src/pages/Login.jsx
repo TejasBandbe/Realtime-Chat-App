@@ -47,7 +47,6 @@ function Login() {
           toast.error(res.data.msg, toastOptions);
         }
         if(res.data.status === true){
-          
           localStorage.setItem('chat-app-user', JSON.stringify(res.data.user));
           history.push("/setAvatar");
         }  

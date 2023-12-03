@@ -63,3 +63,83 @@ module.exports.getAllUsers = async(req, res, next) => {
         next(ex);
     }
 };
+
+module.exports.updateName = async(req, res, next) => {
+    try{
+        const userId = req.params.id;
+        const username = req.body.username;
+        const usernameCheck = await User.findOne({username});
+        if(usernameCheck)
+            return res.json({msg: "username already used", status: false});
+        const userData = await User.findByIdAndUpdate(userId, {username});
+        if(userData !== null){
+            return res.json({msg: "username updated successfully", status: true, userData});
+        }
+        return res.json({msg: "user not found", status: false});
+    }catch(ex){
+        next(ex);
+    }
+};
+
+module.exports.updateEmail = async(req, res, next) => {
+    try{
+        const userId = req.params.id;
+        const email = req.body.email;
+        const emailCheck = await User.findOne({email});
+        if(emailCheck)
+            return res.json({msg: "email id already used", status: false});
+        const userData = await User.findByIdAndUpdate(userId, {email});
+        if(userData !== null)
+            return res.json({msg: "email id updated successfully", status: true, userData});
+        return res.json({msg: "user not found", status: false});
+    }catch(ex){
+        next(ex);
+    }
+};
+
+module.exports.updatePassword = async(req, res, next) => {
+    try{
+        const userId = req.params.id;
+        const {oldpass, newpass} = req.body;
+        const user = await User.findOne({_id: userId});
+        const isPasswordValid = await bcrypt.compare(oldpass, user.password);
+        if(isPasswordValid === false){
+            return res.json({msg: "old password is incorrect", status: false});
+        }
+        const isPasswordSame = await bcrypt.compare(newpass, user.password);
+        if(isPasswordSame){
+            return res.json({msg: "old password and new password should not be same", status: false});
+        }
+        const hashedPassword = await bcrypt.hash(newpass, 10);
+        const userData = await User.findByIdAndUpdate(userId, {password: hashedPassword});
+        if(userData !== null)
+            return res.json({msg: "password updated successfully", status: true, userData});
+        return res.json({msg: "user not found", status: false});
+    }catch(ex){
+        next(ex);
+    }
+};
+
+module.exports.deleteUser = async(req, res, next) => {
+    try{
+        const userId = req.params.id;
+        const userData = await User.deleteOne({_id: userId});
+        if(userData.deletedCount === 1)
+            return res.json({msg: "user deleted", status: true});
+        return res.json({msg: "user not found", status: false});
+    }catch(ex){
+        next(ex);
+    }
+};
+
+module.exports.getUser = async(req, res, next) => {
+    try{
+        const userId = req.params.id;
+        const user = await User.findById(userId);
+        if(user)
+            return res.json({status: true, user});
+        return res.json({msg: "user not found", status: false});
+    }catch(ex){
+        next(ex);
+    }
+}

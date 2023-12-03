@@ -11,7 +11,6 @@ import { log } from '../utils/env';
 function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
   const [messages, setMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
-  
 
   const scrollRef = useRef();
 
@@ -67,8 +66,6 @@ function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
     setMessages(msgs);
   };
 
-  
-  
   useEffect(() => {
     arrivalMessage && setMessages((prev) => [...prev, arrivalMessage]);
   },[arrivalMessage]);
@@ -96,7 +93,6 @@ function ChatContainer({currentChat, currentUser, socket, closeChatWindow}) {
         </div>
         <Logout/>
       </div>
-
       <div className="chat-messages">
         {
           messages.map((message) => {
@@ -175,7 +171,7 @@ const Container = styled.div`
             }
           }
         }
-    }
+      }
   }
   .chat-messages{
     padding: 1rem 2rem;

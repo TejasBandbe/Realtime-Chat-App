@@ -13,6 +13,8 @@
     (while working on localhost, its recommended to use session storage instead of local storage. You can change it in react components and pages)
     7. cd frontend -> npm install (wait till all dependencies are downloaded) -> npm start
 
+    8. Additionally if you want to delete all the messages after specific time interval to reclaim the database space - 
+
 ## Technologies used
     1. MongoDB or MongoDB Atlas for database
     2. Node Js for backend

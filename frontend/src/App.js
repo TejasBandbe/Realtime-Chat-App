@@ -4,6 +4,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Chat from './pages/Chat';
 import SetAvatar from './pages/SetAvatar';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route exact path="/login" component={Login}/>
         <Route exact path="/setAvatar" component={SetAvatar}/>
         <Route exact path="/" component={Chat}/>
+        <Route exact path="/profile" component={Profile}></Route>
     </Router>
       </div>
     </div>

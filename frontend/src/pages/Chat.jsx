@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
-import { allUsersRoute, host } from '../utils/APIRoutes';
+import { allUsersRoute, host, getUserRoute } from '../utils/APIRoutes';
 import Contacts from '../components/Contacts';
 import Welcome from '../components/Welcome';
 import ServerDown from '../components/ServerDown';
@@ -29,7 +29,22 @@ function Chat() {
       setIsLive(true);
       setCurrentUser(JSON.parse(localStorage.getItem("chat-app-user")));
       setIsLoaded(true);
+      const user = JSON.parse(localStorage.getItem("chat-app-user"));
+      const id = user._id;
+      async function fetchUser() {
+        await axios.get(`${getUserRoute}/${id}`)
+        .then(res => {
+          if(res.data.status === true){
+            setCurrentUser(res.data.user);
+          }
+        })
+        .catch(err => {
+          log(err);
+          setIsLive(false);
+        });
     }
+    fetchUser();
+      }
   },[]);
 
   useEffect(() => {
@@ -94,11 +109,11 @@ function Chat() {
         <Contacts contacts={contacts} currentUser={currentUser} 
         changeChat={handleChatChange}/>
 
-        {
-          isLoaded && currentChat === undefined ?
-          (<Welcome currentUser={currentUser}/>) :
-          (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />)
-        }
+            {
+              isLoaded && currentChat === undefined ?
+              (<Welcome currentUser={currentUser}/>) :
+              (<ChatContainer currentChat={currentChat} currentUser={currentUser} socket={socket} />)
+            }
 
       </div>
         ) : (
@@ -107,12 +122,12 @@ function Chat() {
         <Contacts contacts={contacts} currentUser={currentUser} 
         changeChat={handleChatChange}/>
 
-        {
-          isLoaded && currentChat === undefined ?
-          (<Welcome currentUser={currentUser}/>) :
-          (<ChatContainer currentChat={currentChat} currentUser={currentUser} 
-            socket={socket} closeChatWindow={closeChatWindow}/>)
-        }
+            {
+              isLoaded && currentChat === undefined ?
+              (<Welcome currentUser={currentUser}/>) :
+              (<ChatContainer currentChat={currentChat} currentUser={currentUser} 
+                socket={socket} closeChatWindow={closeChatWindow}/>)
+            }
 
       </div>
         )
@@ -140,6 +155,7 @@ const Container = styled.div`
     background-color: #00000076;
     display: grid;
     @media screen and (max-width: 720px){
+      margin-top: 3.5rem;
       height: 100vh;
       width: 100vw;
     }

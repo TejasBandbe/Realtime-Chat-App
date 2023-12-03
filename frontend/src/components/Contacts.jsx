@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import Logo from "../assets/chat.png"; 
 import { constants } from '../utils/env';
 
 function Contacts({contacts, currentUser, changeChat}) {
+  const history = useHistory();
     const [currentUserName, setCurrentUserName] = useState(undefined);
     const [currentUserImage, setCurrentUserImage] = useState(undefined);
     const [currentSelected, setCurrentSelected] = useState(undefined);
@@ -18,6 +20,10 @@ function Contacts({contacts, currentUser, changeChat}) {
     const changeCurrentChat = (index, contact) => {
       setCurrentSelected(index);
       changeChat(contact);
+    };
+
+    const showProfile = () => {
+      history.push("/profile");
     };
 
   return (
@@ -49,7 +55,7 @@ function Contacts({contacts, currentUser, changeChat}) {
           }
           </div>
 
-          <div className="current-user">
+          <div className="current-user" onClick={showProfile}>
             <div className="avatar">
                 <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar"/>
                 </div>
@@ -123,6 +129,7 @@ const Container = styled.div`
     }
   }
   .current-user{
+    cursor: pointer;
     background-color: #0d0d30;
     display: flex;
     justify-content: center;
