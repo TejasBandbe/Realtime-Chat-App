@@ -125,12 +125,19 @@ const Container = styled.div`
   @media screen and (min-width: 720px) and (max-width: 1080px){
     grid-template-row: 15% 70% 15%;
   }
+  @media screen and (max-width: 720px){
+    height: 100%;
+    grid-template-rows: 10% 80% 10%;
+  }
   .chat-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 2rem;
     background-color: #0d0d30;
+    @media screen and (max-width: 720px){
+      padding-top: 1rem;
+    }
     .back-arrow{
       display: none;
       justify-content: center;
@@ -190,6 +197,7 @@ const Container = styled.div`
     @media screen and (max-width: 720px){
       gap: 0.4rem;
       padding: 1rem 1rem;
+      height: 102%;
     }
     .message{
       display: flex;

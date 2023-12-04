@@ -76,6 +76,9 @@ const Container = styled.div`
   grid-template-rows: 10% 75% 15%;
   overflow: hidden;
   background-color: #080420;
+  @media screen and (max-width: 720px){
+    height: 110%;
+  }
   .brand{
     display: flex;
     align-items: center;

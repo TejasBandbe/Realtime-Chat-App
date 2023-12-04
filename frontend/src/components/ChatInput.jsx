@@ -36,7 +36,7 @@ function ChatInput({handleSendMsg}) {
         </div>
       </div>
       <form className='input-container' onSubmit={(e) => sendChat(e)}>
-        <input type="text" placeholder='type your message here' value={msg} 
+        <textarea placeholder='type your message here' value={msg} rows={1}
         onChange={(e)=> setMsg(e.target.value)} onClick={() => setShowEmojiPicker(false)}/>
         <button className='submit'>
             <IoMdSend/>
@@ -113,7 +113,7 @@ const Container = styled.div`
       width: 95%;
       gap: 0.5rem;
     }
-    input{
+    textarea{
         width: 90%;
         height: 60%;
         background-color: transparent;
@@ -121,16 +121,25 @@ const Container = styled.div`
         border: none;
         padding-left: 1rem;
         font-size: 1.2rem;
+        resize: none;
         &::selection{
             background-color: #9a86f3;
         }
         &:focus{
             outline: none;
         }
+        &::-webkit-scrollbar{
+          width: 0.2rem;
+          &-thumb{
+            background-color: #ffffff39;
+            width: 0.1rem;
+            border-radius: 1rem;
+          }
+        }
         @media screen and (max-width: 720px){
           width: 100%;
           padding-left: 0.4rem;
-          font-size: 0.9rem;
+          font-size: 1rem;
         }
     }
     button{
@@ -148,13 +157,13 @@ const Container = styled.div`
           }
         }
         @media screen and (max-width: 720px){
-          padding: 0.3rem 0.5rem;
+          padding: 0.5rem 0.7rem;
         }
         svg{
             font-size: 2rem;
             color: white;
             @media screen and (max-width: 720px){
-              font-size: 1.2rem;
+              font-size: 1.3rem;
             }
         }
     }

@@ -155,8 +155,7 @@ const Container = styled.div`
     background-color: #00000076;
     display: grid;
     @media screen and (max-width: 720px){
-      margin-top: 3.5rem;
-      height: 100vh;
+      min-height: 90%;
       width: 100vw;
     }
   }
